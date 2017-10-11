@@ -1,0 +1,90 @@
+/**
+ * 
+ */
+package com.pmpt.Impl.DaoImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+
+import com.pmpt.common.MainUtilityTools;
+import com.pmpt.interfaces.Dao.BillDAOCus;
+
+
+/**
+ * @ClassName: BillDAOCusImpl.java
+ * @Description: 类说明
+ * @author jianghb
+ * @date 2017年9月13日下午5:36:21
+ */
+@Repository
+public class BillDAOImpl implements BillDAOCus {
+	
+	@PersistenceContext
+	protected EntityManager em;
+	
+	/*
+	 * 首页秒杀信息展示
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> findQuickDeal() {
+		String sql = "select a.endDate z_jieshushijian,max(b.bidAmount) z_zuigaojia,c.alias z_suming,d.picUrl z_shangpinzhutu,\r\n" + 
+				"	case when a.sellerType = '1' then f.iconURL\r\n" + 
+				"	else null end enterprice_iconurl\r\n" + 
+				"	from Bill a\r\n" + 
+				"    left join BillBidRec as b on a.id = b.bill\r\n" + 
+				"    left join Goods as c on a.id = c.billId\r\n" + 
+				"    left join GoodsPic d on d.goodId=c.id and d.flag='1'\r\n" + 
+				"    left join LoginAccout as e on e.id = a.sellerId\r\n" + 
+				"    left join Enterprice as f on e.enterprice = f.id\r\n" + 
+				"    where a.isValid='01' and a.billStatus='3'\r\n" + 
+				"    group by a.id order by DATEDIFF(a.endDate, now()) asc limit 5";
+		Query query = getEm().createNativeQuery(sql);
+		List<Object[]> list = new ArrayList<>();
+		try {
+			list = query.getResultList();
+		} catch (Exception e) {
+			MainUtilityTools.catchException(e, this.getClass(), "");
+			return list;
+		}
+		return list;
+	}
+
+	/* 
+	 * 首页预热信息展示
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> findWarmUp() {
+		String sql = "select a.initPrice z_qipaijia, a.startDate z_kaishishijian, b.commodity z_suming, c.picUrl z_shangpingzhutu,\r\n" + 
+				"		e.iconURL z_iconurl\r\n" + 
+				"	from Bill as a\r\n" + 
+				"    left join goods as b on b.billId = a.id\r\n" + 
+				"    left join goodspic as c on c.goodId = b.id and c.flag = '1'\r\n" + 
+				"    left join loginaccout as d on d.id = a.sellerId\r\n" + 
+				"    left join enterprice as e on e.id = d.enterprice\r\n" + 
+				"	where a.isValid='01' and a.billStatus='2'\r\n" + 
+				"    group by a.id order by DATEDIFF(a.startDate, now()) asc limit 5";
+		Query query = getEm().createNativeQuery(sql);
+		List<Object[]> list = new ArrayList<>();
+		try {
+			list = query.getResultList();
+		} catch (Exception e) {
+			MainUtilityTools.catchException(e, this.getClass(), "");
+			return list;
+		}
+		return list;
+	}
+	
+	public EntityManager getEm() {
+		return em;
+	}
+
+
+}

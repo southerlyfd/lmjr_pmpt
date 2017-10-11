@@ -1,0 +1,130 @@
+package com.pmpt.Impl.ServiceImpl;
+
+import com.pmpt.entities.enums.Classification;
+import com.pmpt.interfaces.Dao.BillDAOCus;
+import com.pmpt.interfaces.Service.IndexService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class IndexServiceImpl implements IndexService {
+
+/*	@Autowired
+	private BillDAO dao;*/
+	@Autowired
+	private BillDAOCus dao2;
+
+	@Override
+	public List<Object[]> findQuickDeal() {
+		return dao2.findQuickDeal();
+	}
+
+	@Override
+	public List<Map<String, String>> getClassifications() {
+		Map<String, String> map = null;
+		List<Map<String, String>> list = new ArrayList<>();
+		for (Classification classification : Classification.values()) {
+			map = new HashMap<>();
+			map.put("code", classification.getCode());
+			map.put("categoryName", classification.getCategoryName());
+			map.put("classificationUrl", classification.getClassificationUrl());
+			list.add(map);
+		}
+		return list;
+	}
+	
+	@Override
+	public List<Object[]> findWarmUp() {
+		return dao2.findWarmUp();
+	}
+	
+	@Override
+	public List<Object[]> getHotCommodity() {
+		List<Object[]> list = new ArrayList<>();
+		list = dao2.getHotCommodity();
+		return list;
+	}
+	/*public List<Map<String, String>> getHotCommodity() {
+		Map<String, String> map = null;
+		List<Map<String, String>> list = new ArrayList<>();
+		String flag = "";
+		for (Interests interest : Interests.values()) {
+			map = new HashMap<>();
+			map.put("code", interest.getCode());
+			map.put("productName", interest.getProductName());
+			map.put("interestUrl", interest.getInterestUrl());
+			list.add(map);
+			flag = interest.getCode();
+			if (flag != null && !"".equals(flag) && flag.equals("08")) {
+				break;
+			}
+		}
+		return list;
+	}*/
+
+	@Override
+	public Map<String, Object> findInAuction(Integer billId) {
+		Map<String, Object> map = new HashMap<>();
+		Integer goodsId = -1;
+		int flag = 1;
+		List<Object[]> billList = dao2.findInAuction(billId);
+		Object[] bill = billList.get(0);
+		if (0 < bill.length) {
+			goodsId = (Integer) bill[0];
+			List<Object[]> list2 = dao2.findMainFigure(goodsId, flag);
+			map.put("goodsPic", list2);
+			map.put("endDate", bill[1]);
+			map.put("billTitle", bill[2]);
+			map.put("initPrice", bill[3]);
+			map.put("ranges", bill[4]);
+			map.put("pledgePrice", bill[5]);
+			map.put("totalPrice", bill[6]);
+			map.put("highestBid", bill[7]);
+			map.put("videoURL", bill[8]);
+		}
+		return map;
+	}
+
+	@Override
+	public Map<String, Object> findBidRecord(Integer billId) {
+		Map<String, Object> map = new HashMap<>();
+		List<Object[]> list = dao2.findBidRecord(billId);
+		if (!list.isEmpty()) {
+			map.put("bidRecord", list);
+			Object[] obj = list.get(0);
+			BigDecimal highestBid = (BigDecimal) obj[1];
+			map.put("highestBid", highestBid);
+		}
+		return map;
+	}
+
+	@Override
+	public List<Object[]> getHotAuction() {
+		return dao2.getHotAuction();
+	}
+
+	@Override
+	public List<Object[]> getRegionalSelection() {
+		return dao2.getRegionalSelection();
+	}
+
+	@Override
+	public List<Object[]> getMoreSelections() {
+		return dao2.getMoreSelections();
+	}
+
+
+
+
+
+
+	
+
+}

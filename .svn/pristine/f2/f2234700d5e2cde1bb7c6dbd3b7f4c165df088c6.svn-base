@@ -1,0 +1,44 @@
+package com.pmpt.Impl.ServiceImpl;
+
+import com.pmpt.interfaces.Dao.BillDAO;
+import com.pmpt.interfaces.Dao.BillDAOCus;
+import com.pmpt.interfaces.Service.IndexService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@ComponentScan("com.pmpt.domain.bill.dao")
+public class IndexServiceImpl implements IndexService {
+
+	@Autowired
+	private BillDAO dao;
+	@Autowired
+	private BillDAOCus dao2;
+
+	@Override
+	public List<Object[]> findQuickDeal() {
+
+		return null;
+	}
+
+	@Override
+	public ArrayList getRecommend() {
+		return null;
+	}
+
+	@Override
+	public ArrayList findInAuction() {
+		return null;
+	}
+
+	@Override
+	public Object getHeadLine() {
+		return null;
+	}
+
+}

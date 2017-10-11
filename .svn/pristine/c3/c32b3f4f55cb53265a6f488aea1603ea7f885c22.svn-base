@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package com.pmpt.Impl.DaoImpl;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+
+import com.pmpt.interfaces.Dao.BillDAOCus;
+
+
+/**
+ * @ClassName: BillDAOCusImpl.java
+ * @Description: 类说明
+ * @author jianghb
+ * @date 2017年9月13日下午5:36:21
+ */
+@Repository
+public class BillDAOImpl implements BillDAOCus {
+	
+	@PersistenceContext
+	protected EntityManager em;
+	
+	/*
+	 * 首页秒杀信息展示
+	 */
+	@Override
+	public List<Object[]> findQuickDeal() {
+		Query query = em.createNamedQuery("");
+		return null;
+	}
+
+}

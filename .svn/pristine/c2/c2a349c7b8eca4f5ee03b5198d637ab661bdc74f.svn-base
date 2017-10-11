@@ -1,0 +1,568 @@
+package com.pmpt.Impl.DaoImpl;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
+
+import com.pmpt.entities.Address;
+import com.pmpt.entities.Bill;
+import com.pmpt.entities.Goods;
+import com.pmpt.entities.Interest;
+import com.pmpt.entities.LoginAccout;
+import com.pmpt.entities.MyTrack;
+import com.pmpt.entities.Transport;
+import com.pmpt.entities.User;
+import com.pmpt.entities.enums.Valid;
+import com.pmpt.interfaces.Dao.HomeDAOCus;
+
+/**
+ * @ClassName: HomeDAOImpl
+ * @Description: TODO
+ * @author: 汪洋
+ * @date: 2017年8月10日 下午7:52:44
+ */
+@Repository
+public class HomeDAOImpl implements HomeDAOCus {
+
+	@PersistenceContext
+	protected EntityManager em;
+
+	@Autowired
+	private MongoTemplate mongoTemplate;
+
+	/**
+	 * 新增收货地址
+	 * 
+	 * @param loginAc
+	 */
+	@Transactional
+	public void save(LoginAccout loginAc) {
+		getEm().persist(loginAc);
+	}
+
+	/**
+	 * 修改收货地址
+	 * 
+	 * @param id
+	 * @param name
+	 * @param mobile
+	 * @param province
+	 * @param detail
+	 */
+	@Transactional
+	public void updateAddr(Integer id, String name, String mobile, String province, String detail) {
+		getEm().createNamedQuery("updateAddr").setParameter("name", name).setParameter("mobile", mobile)
+				.setParameter("province", province).setParameter("detail", detail).setParameter("id", id)
+				.executeUpdate();
+	}
+
+	/**
+	 * 删除收货地址
+	 * 
+	 * @param id
+	 */
+	@Transactional
+	public void delAddr(Integer id) {
+		getEm().createNamedQuery("delAddr").setParameter("id", id).executeUpdate();
+	}
+
+	/**
+	 * 设置默认收货地址
+	 * 
+	 * @param loginAc
+	 */
+	@Transactional
+	public void update(LoginAccout loginAc) {
+		getEm().merge(loginAc);
+	}
+
+	/**
+	 * 根据ID查询收货地址-修改
+	 * 
+	 * @param id
+	 */
+	public Address findAddrById(Integer id) {
+		return getEm().createNamedQuery("findAddrById", Address.class).setParameter("id", id).getSingleResult();
+	}
+
+	/**
+	 * 根据账户ID查询收货地址
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object> findAddrByLoginAcId(Integer loginAcId) {
+		return getEm().createNativeQuery(
+				"select addr.id,addr.aName,addr.mobile,addr.province,addr.detail,addr.defaultAddr from Address addr "
+						+ "where addr.loginAcId=:loginAcId")
+				.setParameter("loginAcId", loginAcId).getResultList();
+	}
+
+	/**
+	 * 根据ID查找用户个人信息
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Object[] findLoginInfo(Integer id) {
+		Object[] objects = (Object[]) getEm()
+				.createNativeQuery("select la.nickName,la.picUrl,if(la.personalValid=1,'已认证','未认证') as personalValid,"
+						+ "if(la.enterpriceValid=1,'已认证','未认证') as enterpriceValid "
+						+ "from LoginAccout la where la.id=:id")
+				.setParameter("id", id).getSingleResult();
+		return objects;
+	}
+
+	/**
+	 * 根据账户ID查询我的模块/商品详情页中头像、姓名、发布数/用户个人主页中头像、姓名、认证信息
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public Object[] findMeByLoginAcId(Integer loginAcId) {
+		Object[] objects = (Object[]) getEm().createNativeQuery(
+				// TODO 后续加认证信息
+				"select la.picUrl,la.nickName,count(bill.buyerId) as buyerIds,count(bill.sellerId) as sellerId "
+						+ "from LoginAccout la left join Bill bill on la.id = bill.buyerId or la.id = bill.sellerId "
+						+ "and bill.isValid = '01' where la.id = :loginAcId")
+				.setParameter("loginAcId", loginAcId).getSingleResult();
+		return objects;
+	}
+
+	/**
+	 * 修改用户昵称
+	 * 
+	 * @param nickName
+	 * @param id
+	 */
+	@Transactional
+	public void changeNickName(String nickName, Integer id) {
+		getEm().createNamedQuery("changeNickName").setParameter("nickName", nickName).setParameter("id", id)
+				.executeUpdate();
+	}
+
+	/**
+	 * 修改头像
+	 * 
+	 * @param fileURl
+	 * @param id
+	 */
+	@Transactional
+	public void changeHeadImg(String fileURl, Integer id) {
+		getEm().createNamedQuery("changeHeadImg").setParameter("fileURl", fileURl).setParameter("id", id)
+				.executeUpdate();
+	}
+
+	/**
+	 * 查询订单商品首个图片
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> findFirstPicByBillId(Integer billId) {
+		return getEm().createNativeQuery(
+				"select gp.picUrl from Goods g left join GoodsPic gp on g.id = gp.goodId where g.billId = :billId")
+				.setParameter("billId", billId).getResultList();
+	}
+
+	/**
+	 * 查询订单中商品列表
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Goods> findGoodInfoByBillId(Integer billId) {
+		// TODO 如果用JPQL查商品会关联订单和商品，所以这里原生查询用*了，可优化
+		return getEm().createNativeQuery("select * from Goods goods where goods.billId = :billId", Goods.class)
+				.setParameter("billId", billId).getResultList();
+	}
+
+	/**
+	 * 删除收藏/提醒
+	 * 
+	 * @param billId
+	 */
+	@Transactional
+	public void delBillById(Integer billId) {
+		getEm().createNamedQuery("delBillById").setParameter("isValid", Valid.NOVALID.getKey())
+				.setParameter("billId", billId).executeUpdate();
+	}
+
+	/**
+	 * 查询买过的订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> findBoughtBillsById(Integer loginAcId, List<String> statusList) {
+		return getEm().createNativeQuery("select b.id, b.billNo,b.billTitle,b.initPrice,b.unit "
+				+ "from Bill b where b.buyerId = :loginAcId and b.billStatus in :statusList and b.isValid = '01'")
+				.setParameter("loginAcId", loginAcId).setParameter("statusList", statusList).getResultList();
+
+	}
+
+	/**
+	 * 查询发布的订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> findPubBillsById(Integer loginAcId, List<String> statusList) {
+		return getEm().createNativeQuery("select b.id, b.billNo,b.billTitle,b.initPrice,b.unit "
+				+ "from Bill b where b.sellerId = :loginAcId and b.billStatus in :statusList and b.isValid = '01'")
+				.setParameter("loginAcId", loginAcId).setParameter("statusList", statusList).getResultList();
+	}
+
+	/**
+	 * 查询我的提醒参拍订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> findRemBillsById(Integer loginAcId, List<String> statusList) {
+		return getEm().createNativeQuery("select b.id, b.billNo,b.billTitle,b.initPrice,b.unit "
+				+ "from Bill b where b.remindId = :loginAcId and b.billStatus in :statusList and b.isValid = '01'")
+				.setParameter("loginAcId", loginAcId).setParameter("statusList", statusList).getResultList();
+	}
+
+	/**
+	 * 根据商品ID查询商品
+	 * 
+	 * @param goodsId
+	 * @return
+	 */
+	public Goods findGoodsById(Integer goodsId) {
+		return getEm().createNamedQuery("findGoodsById", Goods.class).setParameter("goodsId", goodsId)
+				.getSingleResult();
+	}
+
+	/**
+	 * 收藏
+	 * 
+	 * @param bill
+	 */
+	@Transactional
+	public void collect(Bill bill) {
+		getEm().persist(bill);
+	}
+
+	/**
+	 * 提醒
+	 * 
+	 * @param bill
+	 */
+	@Transactional
+	public void remind(Bill bill) {
+		getEm().persist(bill);
+	}
+
+	/**
+	 * 发货-查询发货订单
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Object[] findSGoodsBill(Integer billId) {
+		Object[] objects = (Object[]) getEm()
+				.createNativeQuery("select b.billNo,b.billTitle,b.currentPrice, "
+						+ "b.unit,b.pledgePrice,b.finalPrice,count(g.id) as gCount, "
+						+ "addr.aName,addr.mobile,addr.detailAddr,addr.levMsg "
+						+ "from Bill b left join Goods g on b.id = g.billId "
+						+ "left join Address addr on b.sendAddr = addr.id where b.id = :billId and b.isValid = '01'")
+				.setParameter("billId", billId).getSingleResult();
+		return objects;
+	}
+
+	/**
+	 * 根据订单ID查询订单信息
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Bill findInfoByBillId(Integer billId) {
+		return getEm().createNamedQuery("findInfoByBillId", Bill.class).setParameter("billId", billId)
+				.setParameter("isValid", Valid.VALID.getKey()).getSingleResult();
+	}
+
+	/**
+	 * 确认发货
+	 * 
+	 * @param bill
+	 */
+	@Transactional
+	public void sendGoods(Bill bill) {
+		getEm().persist(bill);
+	}
+
+	/**
+	 * 根据订单ID查询货车送货信息
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Transport> findTransportByBillId(Integer billId) {
+		// TODO 为了t.billId 用*了，可优化
+		return getEm().createNativeQuery("select t.* from Transport t where t.billId=:billId", Transport.class)
+				.setParameter("billId", billId).getResultList();
+	}
+
+	/**
+	 * 根据订单ID查询确认付款订单
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Object[] findPayBillById(Integer billId) {
+		Object[] objects = (Object[]) getEm()
+				.createNativeQuery("select b.billNo,b.billTitle,b.currentPrice, "
+						+ "b.unit,b.pledgePrice,b.finalPrice,count(g.id) as gCount,b.commPrice, "
+						+ "addr.aName,addr.mobile,addr.detailAddr,addr.levMsg "
+						+ "from Bill b left join Goods g on b.id = g.billId "
+						+ "left join Address addr on b.recvAddr = addr.id where b.id = :billId and b.isValid = '01'")
+				.setParameter("billId", billId).getSingleResult();
+		return objects;
+	}
+
+	/**
+	 * 更改订单状态
+	 * 
+	 * @param status
+	 * @param billId
+	 */
+	@Transactional
+	public void updateBillStatus(String status, Integer billId) {
+		getEm().createNamedQuery("updateBillStatus").setParameter("status", status).setParameter("billId", billId)
+				.executeUpdate();
+	}
+
+	/**
+	 * 商品详情页面查询
+	 * 
+	 * @param goodId
+	 * @return
+	 */
+	public Object[] findGoodsInfo(Integer goodId) {
+		return (Object[]) getEm().createNativeQuery(
+				"select (case when b.billStatus in ('1','2')  then '即将开始' when b.billStatus='3' then '正在拍卖' "
+						+ "when b.billStatus in('5','7','02','03','04') then '拍卖结束' end) as billStatus,"
+						+ "b.billTitle,b.initPrice,b.ranges,b.pledgePrice,"
+						+ "(case when b.billStatus in ('1','2') then b.initPrice "
+						+ "when b.billStatus='3' then b.currentPrice "
+						+ "when b.billStatus in('5','7','02','03','04') then b.transPrice "
+						+ "when b.billStatus='8' then b.initPrice end) as currentPrice,g.goodsDes,"
+						+ "g.spec,b.unit,g.production,g.quality,g.commodity,b.sellerId,b.id "
+						// TODO 竞拍记录后续加
+						+ "from Goods g left join Bill b on g.billId = b.id "
+						+ "where g.id=:goodId and b.isValid = '01'")
+				.setParameter("goodId", goodId).getSingleResult();
+	}
+
+	/**
+	 * 个人用户主页查询
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> findLoginAcHomeById(Integer loginAcId) {
+		return getEm()
+				.createNativeQuery("select b.id,b.billTitle,(case when b.billStatus in ('1','2') then b.initPrice "
+						+ "when b.billStatus='3' then b.currentPrice "
+						+ "when b.billStatus in('5','7','02','03','04') then b.transPrice "
+						+ "when b.billStatus='8' then '流拍' end) as currentPrice,"
+						+ "b.unit from Bill b where b.sellerId = :loginAcId and b.isValid = '01'")
+				.setParameter("loginAcId", loginAcId).getResultList();
+	}
+
+	/**
+	 * 查询我的关注
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<LoginAccout> findMyFollowed(Integer loginAcId) {
+		return getEm().createNamedQuery("findMyFollowed").setParameter("loginAcId", loginAcId).getResultList();
+	}
+
+	/**
+	 * 取消关注
+	 * 
+	 * @param loginAc
+	 */
+	@Transactional
+	public void cancelFollowed(LoginAccout loginAc) {
+		getEm().merge(loginAc);
+	}
+
+	/**
+	 * 查询我的足迹
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> findMyTrackByBillId(Integer billId) {
+		return getEm()
+				.createNativeQuery("select b.id,b.billTitle,(case when b.billStatus in ('1','2') then b.initPrice "
+						+ "when b.billStatus='3' then b.currentPrice "
+						+ "when b.billStatus in('5','7','02','03','04') then b.transPrice "
+						+ "when b.billStatus='8' then '流拍' end) as currentPrice,"
+						+ "b.unit from Bill b where b.id = :billId and b.isValid = '01'")
+				.setParameter("billId", billId).getResultList();
+	}
+
+	/**
+	 * 查询相同loginAcId和billId的记录是否存在
+	 * 
+	 * @param billId
+	 * @param loginAcId
+	 */
+	public MyTrack isExistTrack(Integer billId, Integer loginAcId) {
+		return mongoTemplate.findOne(new Query(Criteria.where("billId").is(billId).and("loginAcId").is(loginAcId)),
+				MyTrack.class);
+	}
+
+	/**
+	 * 往mongodb中插入我的足迹
+	 * 
+	 * @param myTrack
+	 */
+	public void addTrack(MyTrack myTrack) {
+		mongoTemplate.insert(myTrack);
+	}
+
+	/**
+	 * 查询我的足迹
+	 * 
+	 * @param loginAcId
+	 */
+	public List<MyTrack> findMyTrack(Integer loginAcId) {
+		return mongoTemplate.find(new Query(Criteria.where("loginAcId").is(loginAcId)), MyTrack.class);
+	}
+
+	/**
+	 * 删除我的足迹
+	 * 
+	 * @param id
+	 */
+	public void delMyTrack(String id) {
+		mongoTemplate.remove(new Query(Criteria.where("id").is(id)), MyTrack.class);
+	}
+
+	/**
+	 * 查询我的喜好
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Interest> findMyLikes(String loginAcId) {
+		return mongoTemplate.find(new Query(Criteria.where("loginAccoutId").is(loginAcId)), Interest.class);
+	}
+
+	/**
+	 * 清空我的喜好
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public void delMyLikes(Interest interest) {
+		mongoTemplate.remove(interest);
+	}
+
+	/**
+	 * 修改我的喜好
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public void addMyLikes(List<Interest> interests) {
+		mongoTemplate.insertAll(interests);
+	}
+
+	/**
+	 * 根据账户ID查询收藏订单列表
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Bill> findCollectBills(Integer loginAcId) {
+		return getEm().createNamedQuery("findCollectBills").setParameter("loginAcId", loginAcId).getResultList();
+	}
+
+	/**
+	 * 根据账户ID查询提醒订单列表
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Bill> findRemindBills(Integer loginAcId) {
+		return getEm().createNamedQuery("findRemindBills").setParameter("loginAcId", loginAcId).getResultList();
+	}
+
+	/**
+	 * 根据商品ID查询订单
+	 * 
+	 * @param goodId
+	 * @return
+	 */
+	public Integer findBillByGId(Integer goodId) {
+		Object billId = getEm()
+				.createNativeQuery("select b.id from Bill b right join Goods g on b.id = g.billId where g.id =:goodId")
+				.setParameter("goodId", goodId).getSingleResult();
+		return Integer.valueOf(billId.toString());
+	}
+
+	/**
+	 * 根据账户ID查询账户信息
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public LoginAccout findAccountInfoById(Integer loginAcId) {
+		return getEm().createNamedQuery("findAccountInfoById", LoginAccout.class).setParameter("loginAcId", loginAcId)
+				.getSingleResult();
+	}
+
+	/**
+	 * 根据账户ID查询账户验证状态
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public Object[] findValidStatusById(Integer loginAcId) {
+		return (Object[]) getEm().createNamedQuery("findValidStatusById").setParameter("loginAcId", loginAcId)
+				.getSingleResult();
+	}
+
+	/**
+	 * 个人认证成功后新增用户
+	 */
+	public void addUser(User user) {
+		getEm().persist(user);
+	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+}

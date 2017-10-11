@@ -1,0 +1,640 @@
+package com.pmpt.entities;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * @ClassName: Bill
+ * @Description: 销售单/购物单
+ * @Author: 汪洋
+ * @Date: 2017年8月16日 上午9:30:04
+ */
+@Entity
+@NamedQueries({
+
+		@NamedQuery(name = "findInfoByBillId", query = "select bill from Bill bill where bill.id =:billId and bill.isValid=:isValid"),
+		@NamedQuery(name = "delBillById", query = "update Bill bill set bill.isValid=:isValid where bill.id =:billId"),
+		@NamedQuery(name = "updateBillStatus", query = "update Bill bill set bill.billStatus=:status where bill.id =:billId")
+
+})
+public class Bill extends Object implements Serializable {
+
+	private static final long serialVersionUID = -9138553143538145451L;
+
+	// 主键
+	private Integer id;
+
+	// 订单编号
+	private String billNo;
+
+	// 订单类型(买单或卖单-分表取代)
+	private String billType;
+
+	// 订单标题
+	private String billTitle;
+
+	// 计量单位值
+	private BigDecimal unitValue;
+
+	// 计量单位(重量或体积)
+	private String unit;
+
+	// 起始时间
+	private Date startDate;
+
+	// 结束时间
+	private Date endDate;
+
+	// 起拍价
+	private BigDecimal initPrice;
+
+	// 加价幅度
+	private BigDecimal ranges;
+
+	// 保证金
+	private BigDecimal pledgePrice;
+
+	// 拍卖上架费
+	private BigDecimal fee;
+
+	// 尾款
+	private BigDecimal finalPrice;
+
+	// 佣金
+	private BigDecimal commPrice;
+
+	// 发布商品上架的总计金额 合计金额=保证金+拍卖上架费
+	private BigDecimal totalPrice;
+
+	// 卖家上架商品的支付方式
+	private String payType;
+
+	// 成交价格
+	private BigDecimal transPrice;
+
+	// 当前拍卖价格
+	private BigDecimal currentPrice;
+
+	// 发货时间
+	private Date issueDate;
+
+	// 买家付款时间
+	private Date payDate;
+
+	// 商品
+	private List<Goods> goodList;
+
+	// 买家
+	private LoginAccout buyerId;
+
+	// 卖家
+	private LoginAccout sellerId;
+
+	// 收藏用户
+	private LoginAccout collecterId;
+
+	// 订单状态
+	private String billStatus;
+
+	// 提醒用户
+	private LoginAccout remindId;
+
+	// 发货地址
+	private Address sendAddr;
+
+	// 收货地址
+	private Address recvAddr;
+
+	// 货车送货信息
+	private List<Transport> transport;
+
+	// 是否有效
+	private String isValid;
+	
+	// 拍卖单的所有竞价记录
+	private List<BillBidRec> billBidRecs;
+	
+	// 卖家
+	private String sellerType; // 0-geren,1-qiye
+
+	@Id
+	@GeneratedValue
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Column(nullable = false)
+	public String getBillNo() {
+		return billNo;
+	}
+
+	public void setBillNo(String billNo) {
+		this.billNo = billNo;
+	}
+
+	@Column(nullable = false)
+	public String getBillType() {
+		return billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
+	@Column(nullable = false)
+	public String getBillTitle() {
+		return billTitle;
+	}
+
+	public void setBillTitle(String billTitle) {
+		this.billTitle = billTitle;
+	}
+
+	@Column(nullable = false)
+	public BigDecimal getUnitValue() {
+		return unitValue;
+	}
+
+	public void setUnitValue(BigDecimal unitValue) {
+		this.unitValue = unitValue;
+	}
+
+	@Column(nullable = false)
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	@Column
+	public BigDecimal getInitPrice() {
+		return initPrice;
+	}
+
+	public void setInitPrice(BigDecimal initPrice) {
+		this.initPrice = initPrice;
+	}
+
+	@Column
+	public BigDecimal getRanges() {
+		return ranges;
+	}
+
+	public void setRanges(BigDecimal ranges) {
+		this.ranges = ranges;
+	}
+
+	@Column
+	public BigDecimal getPledgePrice() {
+		return pledgePrice;
+	}
+
+	public void setPledgePrice(BigDecimal pledgePrice) {
+		this.pledgePrice = pledgePrice;
+	}
+
+	@Column
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+
+	@Column
+	public BigDecimal getFinalPrice() {
+		return finalPrice;
+	}
+
+	public void setFinalPrice(BigDecimal finalPrice) {
+		this.finalPrice = finalPrice;
+	}
+
+	@Column
+	public BigDecimal getCommPrice() {
+		return commPrice;
+	}
+
+	public void setCommPrice(BigDecimal commPrice) {
+		this.commPrice = commPrice;
+	}
+
+	@Column
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(BigDecimal totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+	@Column
+	public String getPayType() {
+		return payType;
+	}
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	@Column
+	public BigDecimal getTransPrice() {
+		return transPrice;
+	}
+
+	public void setTransPrice(BigDecimal transPrice) {
+		this.transPrice = transPrice;
+	}
+
+	@Column
+	public BigDecimal getCurrentPrice() {
+		return currentPrice;
+	}
+
+	public void setCurrentPrice(BigDecimal currentPrice) {
+		this.currentPrice = currentPrice;
+	}
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+	public Date getIssueDate() {
+		return issueDate;
+	}
+
+	public void setIssueDate(Date issueDate) {
+		this.issueDate = issueDate;
+	}
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIME)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+	public Date getPayDate() {
+		return payDate;
+	}
+
+	public void setPayDate(Date payDate) {
+		this.payDate = payDate;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "billId")
+	public List<Goods> getGoodList() {
+		return goodList;
+	}
+
+	public void setGoodList(List<Goods> goodList) {
+		this.goodList = goodList;
+	}
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	public LoginAccout getBuyerId() {
+		return buyerId;
+	}
+
+	public void setBuyerId(LoginAccout buyerId) {
+		this.buyerId = buyerId;
+	}
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	public LoginAccout getSellerId() {
+		return sellerId;
+	}
+
+	public void setSellerId(LoginAccout sellerId) {
+		this.sellerId = sellerId;
+	}
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	public LoginAccout getCollecterId() {
+		return collecterId;
+	}
+
+	public void setCollecterId(LoginAccout collecterId) {
+		this.collecterId = collecterId;
+	}
+
+	@Column(nullable = false)
+	public String getBillStatus() {
+		return billStatus;
+	}
+
+	public void setBillStatus(String billStatus) {
+		this.billStatus = billStatus;
+	}
+
+	@ManyToOne(cascade = CascadeType.ALL)
+	public LoginAccout getRemindId() {
+		return remindId;
+	}
+
+	public void setRemindId(LoginAccout remindId) {
+		this.remindId = remindId;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "sendAddr")
+	public Address getSendAddr() {
+		return sendAddr;
+	}
+
+	public void setSendAddr(Address sendAddr) {
+		this.sendAddr = sendAddr;
+	}
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "recvAddr")
+	public Address getRecvAddr() {
+		return recvAddr;
+	}
+
+	public void setRecvAddr(Address recvAddr) {
+		this.recvAddr = recvAddr;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "billId")
+	public List<Transport> getTransport() {
+		return transport;
+	}
+
+	public void setTransport(List<Transport> transport) {
+		this.transport = transport;
+	}
+
+	@Column(nullable = false)
+	public String getIsValid() {
+		return isValid;
+	}
+
+	public void setIsValid(String isValid) {
+		this.isValid = isValid;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((billNo == null) ? 0 : billNo.hashCode());
+		result = prime * result + ((billStatus == null) ? 0 : billStatus.hashCode());
+		result = prime * result + ((billTitle == null) ? 0 : billTitle.hashCode());
+		result = prime * result + ((billType == null) ? 0 : billType.hashCode());
+		result = prime * result + ((buyerId == null) ? 0 : buyerId.hashCode());
+		result = prime * result + ((collecterId == null) ? 0 : collecterId.hashCode());
+		result = prime * result + ((commPrice == null) ? 0 : commPrice.hashCode());
+		result = prime * result + ((currentPrice == null) ? 0 : currentPrice.hashCode());
+		result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
+		result = prime * result + ((fee == null) ? 0 : fee.hashCode());
+		result = prime * result + ((finalPrice == null) ? 0 : finalPrice.hashCode());
+		result = prime * result + ((goodList == null) ? 0 : goodList.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((initPrice == null) ? 0 : initPrice.hashCode());
+		result = prime * result + ((isValid == null) ? 0 : isValid.hashCode());
+		result = prime * result + ((issueDate == null) ? 0 : issueDate.hashCode());
+		result = prime * result + ((payDate == null) ? 0 : payDate.hashCode());
+		result = prime * result + ((payType == null) ? 0 : payType.hashCode());
+		result = prime * result + ((pledgePrice == null) ? 0 : pledgePrice.hashCode());
+		result = prime * result + ((ranges == null) ? 0 : ranges.hashCode());
+		result = prime * result + ((recvAddr == null) ? 0 : recvAddr.hashCode());
+		result = prime * result + ((remindId == null) ? 0 : remindId.hashCode());
+		result = prime * result + ((sellerId == null) ? 0 : sellerId.hashCode());
+		result = prime * result + ((sendAddr == null) ? 0 : sendAddr.hashCode());
+		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
+		result = prime * result + ((totalPrice == null) ? 0 : totalPrice.hashCode());
+		result = prime * result + ((transPrice == null) ? 0 : transPrice.hashCode());
+		result = prime * result + ((transport == null) ? 0 : transport.hashCode());
+		result = prime * result + ((unit == null) ? 0 : unit.hashCode());
+		result = prime * result + ((unitValue == null) ? 0 : unitValue.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Bill other = (Bill) obj;
+		if (billNo == null) {
+			if (other.billNo != null)
+				return false;
+		} else if (!billNo.equals(other.billNo))
+			return false;
+		if (billStatus == null) {
+			if (other.billStatus != null)
+				return false;
+		} else if (!billStatus.equals(other.billStatus))
+			return false;
+		if (billTitle == null) {
+			if (other.billTitle != null)
+				return false;
+		} else if (!billTitle.equals(other.billTitle))
+			return false;
+		if (billType == null) {
+			if (other.billType != null)
+				return false;
+		} else if (!billType.equals(other.billType))
+			return false;
+		if (buyerId == null) {
+			if (other.buyerId != null)
+				return false;
+		} else if (!buyerId.equals(other.buyerId))
+			return false;
+		if (collecterId == null) {
+			if (other.collecterId != null)
+				return false;
+		} else if (!collecterId.equals(other.collecterId))
+			return false;
+		if (commPrice == null) {
+			if (other.commPrice != null)
+				return false;
+		} else if (!commPrice.equals(other.commPrice))
+			return false;
+		if (currentPrice == null) {
+			if (other.currentPrice != null)
+				return false;
+		} else if (!currentPrice.equals(other.currentPrice))
+			return false;
+		if (endDate == null) {
+			if (other.endDate != null)
+				return false;
+		} else if (!endDate.equals(other.endDate))
+			return false;
+		if (fee == null) {
+			if (other.fee != null)
+				return false;
+		} else if (!fee.equals(other.fee))
+			return false;
+		if (finalPrice == null) {
+			if (other.finalPrice != null)
+				return false;
+		} else if (!finalPrice.equals(other.finalPrice))
+			return false;
+		if (goodList == null) {
+			if (other.goodList != null)
+				return false;
+		} else if (!goodList.equals(other.goodList))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (initPrice == null) {
+			if (other.initPrice != null)
+				return false;
+		} else if (!initPrice.equals(other.initPrice))
+			return false;
+		if (isValid == null) {
+			if (other.isValid != null)
+				return false;
+		} else if (!isValid.equals(other.isValid))
+			return false;
+		if (issueDate == null) {
+			if (other.issueDate != null)
+				return false;
+		} else if (!issueDate.equals(other.issueDate))
+			return false;
+		if (payDate == null) {
+			if (other.payDate != null)
+				return false;
+		} else if (!payDate.equals(other.payDate))
+			return false;
+		if (payType == null) {
+			if (other.payType != null)
+				return false;
+		} else if (!payType.equals(other.payType))
+			return false;
+		if (pledgePrice == null) {
+			if (other.pledgePrice != null)
+				return false;
+		} else if (!pledgePrice.equals(other.pledgePrice))
+			return false;
+		if (ranges == null) {
+			if (other.ranges != null)
+				return false;
+		} else if (!ranges.equals(other.ranges))
+			return false;
+		if (recvAddr == null) {
+			if (other.recvAddr != null)
+				return false;
+		} else if (!recvAddr.equals(other.recvAddr))
+			return false;
+		if (remindId == null) {
+			if (other.remindId != null)
+				return false;
+		} else if (!remindId.equals(other.remindId))
+			return false;
+		if (sellerId == null) {
+			if (other.sellerId != null)
+				return false;
+		} else if (!sellerId.equals(other.sellerId))
+			return false;
+		if (sendAddr == null) {
+			if (other.sendAddr != null)
+				return false;
+		} else if (!sendAddr.equals(other.sendAddr))
+			return false;
+		if (startDate == null) {
+			if (other.startDate != null)
+				return false;
+		} else if (!startDate.equals(other.startDate))
+			return false;
+		if (totalPrice == null) {
+			if (other.totalPrice != null)
+				return false;
+		} else if (!totalPrice.equals(other.totalPrice))
+			return false;
+		if (transPrice == null) {
+			if (other.transPrice != null)
+				return false;
+		} else if (!transPrice.equals(other.transPrice))
+			return false;
+		if (transport == null) {
+			if (other.transport != null)
+				return false;
+		} else if (!transport.equals(other.transport))
+			return false;
+		if (unit == null) {
+			if (other.unit != null)
+				return false;
+		} else if (!unit.equals(other.unit))
+			return false;
+		if (unitValue == null) {
+			if (other.unitValue != null)
+				return false;
+		} else if (!unitValue.equals(other.unitValue))
+			return false;
+		return true;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL)
+	public List<BillBidRec> getBillBidRecs() {
+		return billBidRecs;
+	}
+
+	public void setBillBidRecs(List<BillBidRec> billBidRecs) {
+		this.billBidRecs = billBidRecs;
+	}
+
+	@Column(nullable = false)
+	public String getSellerType() {
+		return sellerType;
+	}
+
+	public void setSellerType(String sellerType) {
+		this.sellerType = sellerType;
+	}
+	
+	
+}

@@ -1,0 +1,35 @@
+/**
+ * 
+ */
+package com.pmpt.interfaces.Service;
+
+import java.util.List;
+
+import com.pmpt.entities.Interest;
+
+
+/**
+ * 
+ * @ClassName: InterestService.java
+ * @Description: 类说明
+ * @author jianghb
+ * @date 2017年9月11日下午4:14:58
+ */
+public interface InterestService {
+	
+	/**
+	 * @param id
+	 * @param loginAccoutId 用户账户ID
+	 * @param commodity 品名
+	 * @param code 编号
+	 * @return
+	 */
+	String addInterest(String id, String loginAccoutId, String commodity, String code);
+	
+	/**
+	 * 通过用户账户ID查询个人喜好
+	 * @param loginAccoutId 用户账户ID
+	 * @return
+	 */
+	List<Interest> queryInterest(String loginAccoutId);
+}

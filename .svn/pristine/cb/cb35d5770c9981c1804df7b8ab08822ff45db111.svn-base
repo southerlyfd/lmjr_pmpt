@@ -1,0 +1,340 @@
+package com.pmpt.interfaces.Dao;
+
+import java.util.List;
+
+import com.pmpt.entities.Address;
+import com.pmpt.entities.Bill;
+import com.pmpt.entities.Goods;
+import com.pmpt.entities.Interest;
+import com.pmpt.entities.LoginAccout;
+import com.pmpt.entities.MyTrack;
+import com.pmpt.entities.Transport;
+import com.pmpt.entities.User;
+
+/**
+ * @ClassName: HomeDAOCus
+ * @Description: TODO
+ * @author: 汪洋
+ * @date: 2017年8月10日 下午7:55:54
+ */
+public interface HomeDAOCus {
+
+	/**
+	 * 新增收货地址
+	 * 
+	 * @param loginAc
+	 */
+	public void save(LoginAccout loginAc);
+
+	/**
+	 * 修改收货地址
+	 * 
+	 * @param id
+	 * @param name
+	 * @param mobile
+	 * @param province
+	 * @param detail
+	 */
+	public void updateAddr(Integer id, String name, String mobile, String province, String detail);
+
+	/**
+	 * 删除收货地址
+	 * 
+	 * @param id
+	 */
+	public void delAddr(Integer id);
+
+	/**
+	 * 设置默认收货地址
+	 * 
+	 * @param loginAc
+	 */
+	public void update(LoginAccout loginAc);
+
+	/**
+	 * 根据ID查询收货地址-修改
+	 * 
+	 * @param id
+	 */
+	public Address findAddrById(Integer id);
+
+	/**
+	 * 根据ID查找用户个人信息
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Object[] findLoginInfo(Integer id);
+
+	/**
+	 * 根据账户ID查询我的模块/商品详情页中头像、姓名、发布数/用户个人主页中头像、姓名、认证信息
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public Object[] findMeByLoginAcId(Integer loginAcId);
+
+	/**
+	 * 根据账户ID查询收货地址
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Object> findAddrByLoginAcId(Integer loginAcId);
+
+	/**
+	 * 修改用户昵称
+	 * 
+	 * @param nickName
+	 * @param id
+	 */
+	public void changeNickName(String nickName, Integer id);
+
+	/**
+	 * 修改头像
+	 * 
+	 * @param fileURl
+	 * @param id
+	 */
+	public void changeHeadImg(String fileURl, Integer id);
+
+	/**
+	 * 查询订单商品首个图片
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public List<String> findFirstPicByBillId(Integer billId);
+
+	/**
+	 * 删除收藏/提醒
+	 * 
+	 * @param billId
+	 */
+	public void delBillById(Integer billId);
+
+	/**
+	 * 查询买过的订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	public List<Object[]> findBoughtBillsById(Integer loginAcId, List<String> statusList);
+
+	/**
+	 * 查询发布的订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	public List<Object[]> findPubBillsById(Integer loginAcId, List<String> statusList);
+
+	/**
+	 * 查询我的提醒参拍订单列表
+	 * 
+	 * @param loginAcId
+	 * @param statusList
+	 * @return
+	 */
+	public List<Object[]> findRemBillsById(Integer loginAcId, List<String> statusList);
+
+	/**
+	 * 根据商品ID查询商品
+	 * 
+	 * @param goodsId
+	 * @return
+	 */
+	public Goods findGoodsById(Integer goodsId);
+
+	/**
+	 * 收藏
+	 * 
+	 * @param bill
+	 */
+	public void collect(Bill bill);
+
+	/**
+	 * 提醒
+	 * 
+	 * @param bill
+	 */
+	public void remind(Bill bill);
+
+	/**
+	 * 发货-查询发货订单
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Object[] findSGoodsBill(Integer billId);
+
+	/**
+	 * 根据订单ID查询订单信息
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Bill findInfoByBillId(Integer billId);
+
+	/**
+	 * 确认发货
+	 * 
+	 * @param bill
+	 */
+	public void sendGoods(Bill bill);
+
+	/**
+	 * 根据订单ID查询货车送货信息
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public List<Transport> findTransportByBillId(Integer billId);
+
+	/**
+	 * 根据订单ID查询确认付款订单
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public Object[] findPayBillById(Integer billId);
+
+	/**
+	 * 更改订单状态
+	 * 
+	 * @param status
+	 * @param billId
+	 */
+	public void updateBillStatus(String status, Integer billId);
+
+	/**
+	 * 商品详情页面查询
+	 * 
+	 * @param goodId
+	 * @return
+	 */
+	public Object[] findGoodsInfo(Integer goodId);
+
+	/**
+	 * 个人用户主页查询
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Object[]> findLoginAcHomeById(Integer loginAcId);
+
+	/**
+	 * 查询我的关注
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<LoginAccout> findMyFollowed(Integer loginAcId);
+
+	/**
+	 * 取消关注
+	 * 
+	 * @param loginAc
+	 */
+	public void cancelFollowed(LoginAccout loginAc);
+
+	/**
+	 * 查询我的足迹
+	 * 
+	 * @param billId
+	 * @return
+	 */
+	public List<Object[]> findMyTrackByBillId(Integer billId);
+
+	/**
+	 * 查询相同loginAcId和billId的记录是否存在
+	 * 
+	 * @param billId
+	 * @param loginAcId
+	 */
+	public MyTrack isExistTrack(Integer billId, Integer loginAcId);
+
+	/**
+	 * 往mongodb中插入我的足迹
+	 * 
+	 * @param myTrack
+	 */
+	public void addTrack(MyTrack myTrack);
+
+	/**
+	 * 查询我的足迹
+	 * 
+	 * @param loginAcId
+	 */
+	public List<MyTrack> findMyTrack(Integer loginAcId);
+
+	/**
+	 * 删除我的足迹
+	 * 
+	 * @param id
+	 */
+	public void delMyTrack(String id);
+
+	/**
+	 * 查询我的喜好
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Interest> findMyLikes(String loginAcId);
+
+	/**
+	 * 清空我的喜好
+	 * 
+	 * @param interest
+	 * @return
+	 */
+	public void delMyLikes(Interest interest);
+
+	/**
+	 * 修改我的喜好
+	 * 
+	 * @param interests
+	 * @return
+	 */
+	public void addMyLikes(List<Interest> interests);
+
+	/**
+	 * 根据账户ID查询收藏订单列表
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Bill> findCollectBills(Integer loginAcId);
+
+	/**
+	 * 根据账户ID查询提醒订单列表
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public List<Bill> findRemindBills(Integer loginAcId);
+
+	/**
+	 * 根据商品ID查询订单
+	 * 
+	 * @param goodId
+	 * @return
+	 */
+	public Integer findBillByGId(Integer goodId);
+
+	/**
+	 * 根据账户ID查询账户信息
+	 * 
+	 * @param loginAcId
+	 * @return
+	 */
+	public LoginAccout findAccountInfoById(Integer loginAcId);
+
+	/**
+	 * 个人认证成功后新增用户
+	 */
+	public void addUser(User user);
+}

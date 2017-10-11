@@ -1,0 +1,17 @@
+package com.pmpt.interfaces.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public interface IndexService {
+	
+	List<Object[]> findQuickDeal();
+	
+	
+    ArrayList getRecommend();
+
+    Object getHeadLine();
+
+    ArrayList findInAuction();
+}

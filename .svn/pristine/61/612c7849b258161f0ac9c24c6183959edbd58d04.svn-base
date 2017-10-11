@@ -1,0 +1,95 @@
+/**
+ * 
+ */
+package com.pmpt.Impl.DaoImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Repository;
+
+import com.pmpt.common.MainUtilityTools;
+import com.pmpt.interfaces.Dao.BillDAOCus;
+
+
+/**
+ * @ClassName: BillDAOCusImpl.java
+ * @Description: 类说明
+ * @author jianghb
+ * @date 2017年9月13日下午5:36:21
+ */
+@Repository
+public class BillDAOImpl implements BillDAOCus {
+	
+	@PersistenceContext
+	protected EntityManager em;
+	
+	/*
+	 * 首页秒杀信息展示
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Object[]> findQuickDeal() {
+		String sql = "select m.z_shengyushijian,m.z_zuigaojia,m.z_suming,m.z_shangpingzhutu,\r\n" + 
+				"	case \r\n" + 
+				"		when m.seller_type = 1 then m.enterprice_iconurl\r\n" + 
+				"	else null end enterprice_iconurl\r\n" + 
+				"	from (\r\n" + 
+				"		select  g.z_shengyushijian z_shengyushijian,g.z_zuigaojia z_zuigaojia,g.z_suming z_suming,\r\n" + 
+				"				g.z_shangpingzhutu z_shangpingzhutu,g.seller_type seller_type,i.enterprice_iconurl enterprice_iconurl\r\n" + 
+				"		from	(\r\n" + 
+				"				select e.z_shengyushijian z_shengyushijian,e.z_zuigaojia z_zuigaojia,f.z_suming z_suming,\r\n" + 
+				"				f.z_shangpingzhutu z_shangpingzhutu,e.bill_enddate bill_enddate,e.seller_type seller_type,e.seller_id seller_id\r\n" + 
+				"				from(\r\n" + 
+				"					select DATEDIFF(a.endDate, now()) z_shengyushijian, max(b.bidAmount) z_zuigaojia,a.id bill_id,\r\n" + 
+				"                    a.sellerId seller_id,a.endDate bill_enddate,a.sellerType seller_type \r\n" + 
+				"									from \r\n" + 
+				"											Bill as a\r\n" + 
+				"										left join \r\n" + 
+				"											BillBidRec as b\r\n" + 
+				"										on a.id = b.bill\r\n" + 
+				"								group by a.id\r\n" + 
+				"					order by DATEDIFF(a.endDate, now()) asc limit 5\r\n" + 
+				"										) as e\r\n" + 
+				"					left join\r\n" + 
+				"					(\r\n" + 
+				"						select c.alias z_suming,d.picUrl z_shangpingzhutu,c.billId goods_billId\r\n" + 
+				"						from \r\n" + 
+				"								Goods as c\r\n" + 
+				"							left join\r\n" + 
+				"								GoodsPic as d\r\n" + 
+				"							on d.flag='1' and d.goodId=c.id\r\n" + 
+				"					) as f\r\n" + 
+				"					on f.goods_billId = e.bill_id\r\n" + 
+				"				) as g\r\n" + 
+				"			left join\r\n" + 
+				"				(\r\n" + 
+				"					select l.iconURL enterprice_iconurl,k.id loginaccout_id\r\n" + 
+				"					from\r\n" + 
+				"						LoginAccout as k\r\n" + 
+				"					left join\r\n" + 
+				"						Enterprice as l\r\n" + 
+				"					on l.id=k.enterprice\r\n" + 
+				"				) as i\r\n" + 
+				"			on i.loginaccout_id = g.seller_id\r\n" + 
+				"			order by DATEDIFF(g.bill_enddate, now()) \r\n" + 
+				"	) as m";
+		Query query = getEm().createNativeQuery(sql);
+		List<Object[]> list = new ArrayList<>();
+		try {
+			list = query.getResultList();
+		} catch (Exception e) {
+			MainUtilityTools.catchException(e, this.getClass(), "");
+			return list;
+		}
+		return list;
+	}
+
+	public EntityManager getEm() {
+		return em;
+	}
+}

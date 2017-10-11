@@ -1,0 +1,272 @@
+package com.pmpt.entities;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.NamedQueries;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import com.pmpt.entities.enums.Valid;
+
+/**
+ * @author jianghb
+ */
+
+@Entity
+@NamedQueries({
+		@NamedQuery(name = "LoginAccout.findAccout", query = "select bean.phone from LoginAccout as bean where bean.phone=?1"),
+		@NamedQuery(name = "LoginAccout.updateLogSession", query = "UPDATE LoginAccout as bean SET bean.loginSeesion=?1 WHERE bean.phone=?2"),
+		@NamedQuery(name = "LoginAccout.signIn", query = "select bean.phone,bean.user.id,bean.loginSeesion.id from LoginAccout as bean where bean.phone=?1 and bean.pwd=?2 and bean.isEffect='01'"),
+		@NamedQuery(name = "changeNickName", query = "update LoginAccout la set la.nickName =:nickName where la.id=:id"),
+		@NamedQuery(name = "changeHeadImg", query = "update LoginAccout la set la.picUrl =:fileURl where la.id=:id"),
+		@NamedQuery(name = "findMyFollowed", query = "select la.loginAcList from LoginAccout la where la.id=:loginAcId"),
+		@NamedQuery(name = "findCollectBills", query = "select la.collectBills from LoginAccout la where la.id=:loginAcId"),
+		@NamedQuery(name = "findRemindBills", query = "select la.remindBills from LoginAccout la where la.id=:loginAcId"),
+		@NamedQuery(name = "findAccountInfoById", query = "select la from LoginAccout la where la.id=:loginAcId"),
+		@NamedQuery(name = "findValidStatusById", query = "select la.personalValid,la.enterpriceValid from LoginAccout la where la.id=:loginAcId")
+
+})
+public class LoginAccout implements Serializable {
+
+	private static final long serialVersionUID = 8830832104796411675L;
+
+	// 主键
+	private Integer id;
+
+	// 手机号
+	private String phone;
+
+	// 密码
+	private String pwd;
+
+	// 账户是否有效
+	private String isEffect = Valid.NOVALID.getKey();
+
+	// 个人是否认证
+	private String personalValid = Valid.NOTVALID.getKey();
+
+	// 企业是否认证
+	private String enterpriceValid = Valid.NOTVALID.getKey();
+
+	// 实名认证用户
+	private User user;
+	
+	// 实名认证企业
+	private Enterprice enterprice;
+
+	// 用户登录缓存信息
+	private LoginSession loginSeesion;
+
+	// 昵称
+	private String nickName;
+
+	// 头像
+	private String picUrl;
+
+	// 收货地址
+	private List<Address> addr;
+
+	// 收藏订单
+	private List<Bill> collectBills;
+
+	// 发布订单
+	private List<Bill> sellerBills;
+
+	// 购买订单
+	private List<Bill> buyerBills;
+
+	// 提醒订单
+	private List<Bill> remindBills;
+
+	// 关注用户list
+	private List<LoginAccout> loginAcList;
+
+	// 环信账号
+	private String hxLoginName;
+
+	// 环信密码
+	private String hxPassword;
+
+	@Id
+	@GeneratedValue
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	@Column(unique = true, nullable = false, length = 15)
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	@Column(nullable = false)
+	public String getPwd() {
+		return pwd;
+	}
+
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+
+	@Column(nullable = false)
+	public String getPersonalValid() {
+		return personalValid;
+	}
+
+	public void setPersonalValid(String personalValid) {
+		this.personalValid = personalValid;
+	}
+
+	@Column(nullable = false)
+	public String getEnterpriceValid() {
+		return enterpriceValid;
+	}
+
+	public void setEnterpriceValid(String enterpriceValid) {
+		this.enterpriceValid = enterpriceValid;
+	}
+
+	@Column(nullable = false)
+	public String getIsEffect() {
+		return isEffect;
+	}
+
+	public void setIsEffect(String isEffect) {
+		this.isEffect = isEffect;
+	}
+
+	@Column
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	@Column
+	public String getPicUrl() {
+		return picUrl;
+	}
+
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
+	}
+
+	@OneToOne
+	public LoginSession getLoginSeesion() {
+		return loginSeesion;
+	}
+
+	public void setLoginSeesion(LoginSession loginSeesion) {
+		this.loginSeesion = loginSeesion;
+	}
+
+	@OneToOne
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "loginAcId")
+	public List<Address> getAddr() {
+		return addr;
+	}
+
+	public void setAddr(List<Address> addr) {
+		this.addr = addr;
+	}
+
+	@ManyToMany(mappedBy = "loginAccouts", cascade = CascadeType.ALL)
+	public List<Bill> getCollectBills() {
+		return collectBills;
+	}
+
+	public void setCollectBills(List<Bill> collectBills) {
+		this.collectBills = collectBills;
+	}
+
+	@OneToMany(mappedBy = "sellerId", cascade = CascadeType.ALL)
+	public List<Bill> getSellerBills() {
+		return sellerBills;
+	}
+
+	public void setSellerBills(List<Bill> sellerBills) {
+		this.sellerBills = sellerBills;
+	}
+
+	@OneToMany(mappedBy = "buyerId", cascade = CascadeType.ALL)
+	public List<Bill> getBuyerBills() {
+		return buyerBills;
+	}
+
+	public void setBuyerBills(List<Bill> buyerBills) {
+		this.buyerBills = buyerBills;
+	}
+
+	@ManyToMany(mappedBy = "remindAccouts", cascade = CascadeType.ALL)
+	public List<Bill> getRemindBills() {
+		return remindBills;
+	}
+
+	public void setRemindBills(List<Bill> remindBills) {
+		this.remindBills = remindBills;
+	}
+
+	@ManyToMany(cascade = CascadeType.ALL)
+	public List<LoginAccout> getLoginAcList() {
+		return loginAcList;
+	}
+
+	public void setLoginAcList(List<LoginAccout> loginAcList) {
+		this.loginAcList = loginAcList;
+	}
+
+	@Column(nullable = false)
+	public String getHxLoginName() {
+		return hxLoginName;
+	}
+
+	public void setHxLoginName(String hxLoginName) {
+		this.hxLoginName = hxLoginName;
+	}
+
+	@Column(nullable = false)
+	public String getHxPassword() {
+		return hxPassword;
+	}
+
+	public void setHxPassword(String hxPassword) {
+		this.hxPassword = hxPassword;
+	}
+
+	@OneToOne
+	public Enterprice getEnterprice() {
+		return enterprice;
+	}
+
+	public void setEnterprice(Enterprice enterprice) {
+		this.enterprice = enterprice;
+	}
+
+}

@@ -1,0 +1,34 @@
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/rhr?characterEncoding=utf-8
+spring.datasource.username=root
+spring.datasource.password=rhr123456
+
+spring.jpa.database=mysql
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.naming-strategy=org.hibernate.cfg.DefaultNamingStrategy
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
+
+#redis
+spring.redis.database=0
+spring.redis.host=127.0.0.1
+spring.redis.port=6379
+spring.redis.password=
+spring.redis.pool.max-active=8
+spring.redis.pool.max-wait=-1
+spring.redis.pool.max-idle=8
+spring.redis.pool.min-idle=0
+spring.redis.timeout=0
+#mongoDB
+spring.data.mongodb.uri=mongodb://192.168.1.110:27017/dev
+#\u81ea\u5b9a\u4e49\u914d\u7f6e
+indexPromotionNum=5
+qiuniu.access_key=5nLbUdmIfs-uYJE16f6o9VzMMj3V_dCwCoj39hC0
+qiuniu.secret_key=FOb_PFfT2kQOVVN23fNlazMApiC7r0AclglJ4a5Q
+bucket=5df4ffb1-23a0-4e44-a0e4-f88bb91c83e3
+domain_of_bucket=http://oue9kuyzh.bkt.clouddn.com
+multipart.max-file-size=50Mb
+multipart.max-request-size=50Mb
+
+# tomcat
+server.port=8080

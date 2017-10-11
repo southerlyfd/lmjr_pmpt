@@ -1,0 +1,15 @@
+package com.pmpt.interfaces;
+
+import java.io.Serializable;
+
+/** 
+ * @ClassName: BaseObject 
+ * @Description: TODO
+ * @Author: 汪洋
+ * @Date: 2017年9月15日 下午4:00:51  
+ */
+public class BaseObject implements Serializable {
+	
+	private static final long serialVersionUID = -4337904090028613970L;
+
+}

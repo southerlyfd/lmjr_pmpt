@@ -1,0 +1,19 @@
+package com.pmpt.interfaces.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+
+public interface IndexService {
+	// 首页秒杀
+	List<Object[]> findQuickDeal();
+	// 热门分类展示
+	List<Map<String, String>> getClassifications();
+	// 推荐
+    ArrayList getRecommend();
+    // 标题
+    Object getHeadLine();
+    // 查看正在拍卖
+    ArrayList findInAuction();
+}

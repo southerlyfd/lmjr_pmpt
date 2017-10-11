@@ -1,0 +1,90 @@
+package com.pmpt.Impl.ServiceImpl;
+
+import com.pmpt.entities.enums.Classification;
+import com.pmpt.entities.enums.Interests;
+import com.pmpt.interfaces.Dao.BillDAO;
+import com.pmpt.interfaces.Dao.BillDAOCus;
+import com.pmpt.interfaces.Service.IndexService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class IndexServiceImpl implements IndexService {
+
+	@Autowired
+	private BillDAO dao;
+	@Autowired
+	private BillDAOCus dao2;
+
+	@Override
+	public List<Object[]> findQuickDeal() {
+		return dao2.findQuickDeal();
+	}
+
+	@Override
+	public List<Map<String, String>> getClassifications() {
+		Map<String, String> map = null;
+		List<Map<String, String>> list = new ArrayList<>();
+		for (Classification classification : Classification.values()) {
+			map = new HashMap<>();
+			map.put("code", classification.getCode());
+			map.put("categoryName", classification.getCategoryName());
+			map.put("classificationUrl", classification.getClassificationUrl());
+			list.add(map);
+		}
+		return list;
+	}
+	
+	@Override
+	public List<Object[]> findWarmUp() {
+		return dao2.findWarmUp();
+	}
+	
+	@Override
+	public List<Map<String, String>> getHotCommodity() {
+		Map<String, String> map = null;
+		List<Map<String, String>> list = new ArrayList<>();
+		String flag = "";
+		for (Interests interest : Interests.values()) {
+			map = new HashMap<>();
+			map.put("code", interest.getCode());
+			map.put("productName", interest.getProductName());
+			map.put("interestUrl", interest.getInterestUrl());
+			list.add(map);
+			flag = interest.getCode();
+			if (flag != null && !"".equals(flag) && flag.equals("08")) {
+				break;
+			}
+		}
+		return list;
+	}
+	
+	@Override
+	public ArrayList getRecommend() {
+		return null;
+	}
+
+	@Override
+	public ArrayList findInAuction() {
+		return null;
+	}
+
+	@Override
+	public Object getHeadLine() {
+		return null;
+	}
+
+
+
+
+
+
+	
+
+}
