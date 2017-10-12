@@ -133,11 +133,14 @@ public class Bill extends Object implements Serializable {
 	// 卖家
 	private String sellerType; // 0-geren,1-qiye
 	
-	// 磅单、码单
-//	private String poundBill;
+	// 磅单、码单(新)
+	private String poundBill;
 	
-	// 订单类型(按原磅单、按过磅、按立方数)
-//	private String billType;
+	// 订单类型(按原磅单、按过磅、按立方数)（新）
+	private String billType;
+	
+	// 数量(新)
+	private Integer num;
 
 	@Id
 	@GeneratedValue
@@ -619,6 +622,33 @@ public class Bill extends Object implements Serializable {
 
 	public void setLoginAccouts(List<LoginAccout> loginAccouts) {
 		this.loginAccouts = loginAccouts;
+	}
+
+	@Column(nullable = false)
+	public String getPoundBill() {
+		return poundBill;
+	}
+
+	public void setPoundBill(String poundBill) {
+		this.poundBill = poundBill;
+	}
+
+	@Column(nullable = false)
+	public String getBillType() {
+		return billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
+	@Column(nullable = false)
+	public Integer getNum() {
+		return num;
+	}
+
+	public void setNum(Integer num) {
+		this.num = num;
 	}
 
 }
