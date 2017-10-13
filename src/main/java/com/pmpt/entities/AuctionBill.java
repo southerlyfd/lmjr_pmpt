@@ -13,13 +13,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 /**
  * @ClassName: AuctionBill.java
- * @Description: 拍买单
+ * @Description: 订单表
  * @author jianghb
  * @date 2017年9月14日下午4:02:55
  */
@@ -31,7 +36,7 @@ public class AuctionBill implements Serializable{
 	// 主键
 	private Integer id;
 
-	// 订单编号
+	// 订单编号()
 	private String billNo;
 
 	// 起始时间(付保证金时间)
@@ -40,7 +45,7 @@ public class AuctionBill implements Serializable{
 	// 卖家上架商品的支付方式
 	private String payType;
 	
-	// 保证金(删)
+	// 保证金(算法)
 	private BigDecimal bond;
 
 	// 买家
@@ -57,6 +62,13 @@ public class AuctionBill implements Serializable{
 	
 	// 买单
 	private Bill billId;
+	
+	// 收货地址（新）
+	private Address recvAddr;
+	
+	// 买家付款时间（新）
+	private Date payDate;
+	
 
 	@Id
 	@GeneratedValue
@@ -78,6 +90,8 @@ public class AuctionBill implements Serializable{
 	}
 
 	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
 	public Date getStartDate() {
 		return startDate;
 	}
@@ -146,12 +160,15 @@ public class AuctionBill implements Serializable{
 		int result = 1;
 		result = prime * result + ((aucBillBidRecs == null) ? 0 : aucBillBidRecs.hashCode());
 		result = prime * result + ((auctionNum == null) ? 0 : auctionNum.hashCode());
+		result = prime * result + ((billId == null) ? 0 : billId.hashCode());
 		result = prime * result + ((billNo == null) ? 0 : billNo.hashCode());
 		result = prime * result + ((billStatus == null) ? 0 : billStatus.hashCode());
 		result = prime * result + ((bond == null) ? 0 : bond.hashCode());
 		result = prime * result + ((buyerId == null) ? 0 : buyerId.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((payDate == null) ? 0 : payDate.hashCode());
 		result = prime * result + ((payType == null) ? 0 : payType.hashCode());
+		result = prime * result + ((recvAddr == null) ? 0 : recvAddr.hashCode());
 		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
 		return result;
 	}
@@ -174,6 +191,11 @@ public class AuctionBill implements Serializable{
 			if (other.auctionNum != null)
 				return false;
 		} else if (!auctionNum.equals(other.auctionNum))
+			return false;
+		if (billId == null) {
+			if (other.billId != null)
+				return false;
+		} else if (!billId.equals(other.billId))
 			return false;
 		if (billNo == null) {
 			if (other.billNo != null)
@@ -200,10 +222,20 @@ public class AuctionBill implements Serializable{
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
+		if (payDate == null) {
+			if (other.payDate != null)
+				return false;
+		} else if (!payDate.equals(other.payDate))
+			return false;
 		if (payType == null) {
 			if (other.payType != null)
 				return false;
 		} else if (!payType.equals(other.payType))
+			return false;
+		if (recvAddr == null) {
+			if (other.recvAddr != null)
+				return false;
+		} else if (!recvAddr.equals(other.recvAddr))
 			return false;
 		if (startDate == null) {
 			if (other.startDate != null)
@@ -213,13 +245,32 @@ public class AuctionBill implements Serializable{
 		return true;
 	}
 
-	@OneToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	public Bill getBillId() {
 		return billId;
 	}
 
 	public void setBillId(Bill billId) {
 		this.billId = billId;
+	}
+
+	public Address getRecvAddr() {
+		return recvAddr;
+	}
+
+	public void setRecvAddr(Address recvAddr) {
+		this.recvAddr = recvAddr;
+	}
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+	public Date getPayDate() {
+		return payDate;
+	}
+
+	public void setPayDate(Date payDate) {
+		this.payDate = payDate;
 	}
 	
 }

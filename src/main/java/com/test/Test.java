@@ -3,28 +3,18 @@
  */
 package com.test;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import com.pmpt.common.BCrypt;
 import com.pmpt.common.MainUtilityTools;
 import com.pmpt.common.Parameters;
-import com.pmpt.entities.Address;
-import com.pmpt.entities.BillBidRec;
-import com.pmpt.entities.Goods;
-import com.pmpt.entities.GoodsPic;
-import com.pmpt.entities.LoginAccout;
-import com.pmpt.entities.Transport;
-import com.pmpt.entities.enums.Status;
-import com.pmpt.entities.enums.Valid;
 
 /**
  * @author Administrator
@@ -212,6 +202,14 @@ public class Test {
     		System.out.println("result:"+httpOrgCreateTestRtn);  
 		}
     }  
+    
+    @org.junit.Test
+    public void test1() {
+    	String pwd = "abc123456";
+    	String pwd1 = BCrypt.hashpw(pwd, BCrypt.gensalt());
+    	System.out.println("加密前" + pwd);
+    	System.out.println(pwd1);
+    }
     
 
 }

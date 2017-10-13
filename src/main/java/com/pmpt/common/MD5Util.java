@@ -1,9 +1,7 @@
 package com.pmpt.common;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class MD5Util {
 	// 字符串MD5加密

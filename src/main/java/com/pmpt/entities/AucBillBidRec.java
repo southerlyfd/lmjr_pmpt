@@ -13,10 +13,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * @ClassName: AucBillBidRec.java
- * @Description: 拍买单出价记录表
+ * @Description: 竞拍记录表
  * @author jianghb
  * @date 2017年9月14日下午4:36:00
  */
@@ -60,6 +64,8 @@ public class AucBillBidRec implements Serializable{
 	}
 
 	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
 	public Date getBidTime() {
 		return bidTime;
 	}

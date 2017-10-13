@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -35,11 +36,11 @@ public class Goods implements Serializable {
 	// 商品名称
 	private String gName;
 
-	// 别名
-	private String alias;
+	// 别名(俗名取代)
+//	private String alias;
 
-	// 产地
-	private String production;
+	// 产地(俗名取代)
+//	private String production;
 
 	// 品名
 	private String commodity;
@@ -58,6 +59,9 @@ public class Goods implements Serializable {
 	
 	// 商品视频展示
 	private String videoURL;
+	
+	// 俗名
+	private ProductName productName;
 
 	@Id
 	@GeneratedValue
@@ -78,23 +82,23 @@ public class Goods implements Serializable {
 		this.gName = gName;
 	}
 
-	@Column(nullable = false)
+/*	@Column(nullable = false)
 	public String getAlias() {
 		return alias;
 	}
 
 	public void setAlias(String alias) {
 		this.alias = alias;
-	}
+	}*/
 
-	@Column(nullable = false)
+/*	@Column(nullable = false)
 	public String getProduction() {
 		return production;
 	}
 
 	public void setProduction(String production) {
 		this.production = production;
-	}
+	}*/
 
 	@Column(nullable = false)
 	public String getCommodity() {
@@ -146,13 +150,12 @@ public class Goods implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
 		result = prime * result + ((commodity == null) ? 0 : commodity.hashCode());
 		result = prime * result + ((gName == null) ? 0 : gName.hashCode());
 		result = prime * result + ((goodsDes == null) ? 0 : goodsDes.hashCode());
 		result = prime * result + ((goodsPics == null) ? 0 : goodsPics.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((production == null) ? 0 : production.hashCode());
+		result = prime * result + ((productName == null) ? 0 : productName.hashCode());
 		result = prime * result + ((quality == null) ? 0 : quality.hashCode());
 		result = prime * result + ((spec == null) ? 0 : spec.hashCode());
 		result = prime * result + ((videoURL == null) ? 0 : videoURL.hashCode());
@@ -168,11 +171,6 @@ public class Goods implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Goods other = (Goods) obj;
-		if (alias == null) {
-			if (other.alias != null)
-				return false;
-		} else if (!alias.equals(other.alias))
-			return false;
 		if (commodity == null) {
 			if (other.commodity != null)
 				return false;
@@ -198,10 +196,10 @@ public class Goods implements Serializable {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (production == null) {
-			if (other.production != null)
+		if (productName == null) {
+			if (other.productName != null)
 				return false;
-		} else if (!production.equals(other.production))
+		} else if (!productName.equals(other.productName))
 			return false;
 		if (quality == null) {
 			if (other.quality != null)
@@ -228,6 +226,15 @@ public class Goods implements Serializable {
 
 	public void setVideoURL(String videoURL) {
 		this.videoURL = videoURL;
+	}
+
+	@ManyToOne
+	public ProductName getProductName() {
+		return productName;
+	}
+
+	public void setProductName(ProductName productName) {
+		this.productName = productName;
 	}
 
 }

@@ -94,13 +94,13 @@ public class Bill extends Object implements Serializable {
 	// 发货时间
 	private Date issueDate;
 
-	// 买家付款时间
-	private Date payDate;
+	// 买家付款时间（AuctionBill表）
+	// private Date payDate;
 
 	// 商品
 	private List<Goods> goodList;
 
-	// 买家
+	// 买家（AuctionBill表）
 	private LoginAccout buyerId;
 
 	// 卖家
@@ -118,8 +118,8 @@ public class Bill extends Object implements Serializable {
 	// 发货地址
 	private Address sendAddr;
 
-	// 收货地址
-	private Address recvAddr;
+	// 收货地址(auctionBill表)
+	// private Address recvAddr;
 
 	// 货车送货信息
 	private List<Transport> transport;
@@ -127,16 +127,13 @@ public class Bill extends Object implements Serializable {
 	// 是否有效
 	private String isValid=Valid.VALID.getKey();
 
-	// 拍卖单的所有竞价记录
-	private List<BillBidRec> billBidRecs;
-
 	// 卖家
-	private String sellerType; // 0-geren,1-qiye
+	private Integer sellerType; // 0-geren,1-qiye
 	
-	// 磅单、码单(新)
+	// 磅单、码单图片Url(新)
 	private String poundBill;
 	
-	// 订单类型(按原磅单、按过磅、按立方数)（新）
+	// 订单类型(1-按原磅单、2-按过磅、3-按立方数)（新）
 	private String billType;
 	
 	// 数量(新)
@@ -302,7 +299,7 @@ public class Bill extends Object implements Serializable {
 		this.issueDate = issueDate;
 	}
 
-	@Column(nullable = false)
+/*	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	@JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
 	public Date getPayDate() {
@@ -311,7 +308,7 @@ public class Bill extends Object implements Serializable {
 
 	public void setPayDate(Date payDate) {
 		this.payDate = payDate;
-	}
+	}*/
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "billId")
@@ -369,7 +366,7 @@ public class Bill extends Object implements Serializable {
 		this.sendAddr = sendAddr;
 	}
 
-	@OneToOne(cascade = CascadeType.ALL)
+/*	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "recvAddr")
 	public Address getRecvAddr() {
 		return recvAddr;
@@ -377,7 +374,7 @@ public class Bill extends Object implements Serializable {
 
 	public void setRecvAddr(Address recvAddr) {
 		this.recvAddr = recvAddr;
-	}
+	}*/
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "billId")
@@ -402,10 +399,10 @@ public class Bill extends Object implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((billBidRecs == null) ? 0 : billBidRecs.hashCode());
 		result = prime * result + ((billNo == null) ? 0 : billNo.hashCode());
 		result = prime * result + ((billStatus == null) ? 0 : billStatus.hashCode());
 		result = prime * result + ((billTitle == null) ? 0 : billTitle.hashCode());
+		result = prime * result + ((billType == null) ? 0 : billType.hashCode());
 		result = prime * result + ((buyerId == null) ? 0 : buyerId.hashCode());
 		result = prime * result + ((commPrice == null) ? 0 : commPrice.hashCode());
 		result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
@@ -417,11 +414,11 @@ public class Bill extends Object implements Serializable {
 		result = prime * result + ((isValid == null) ? 0 : isValid.hashCode());
 		result = prime * result + ((issueDate == null) ? 0 : issueDate.hashCode());
 		result = prime * result + ((loginAccouts == null) ? 0 : loginAccouts.hashCode());
-		result = prime * result + ((payDate == null) ? 0 : payDate.hashCode());
+		result = prime * result + ((num == null) ? 0 : num.hashCode());
 		result = prime * result + ((payType == null) ? 0 : payType.hashCode());
 		result = prime * result + ((pledgePrice == null) ? 0 : pledgePrice.hashCode());
+		result = prime * result + ((poundBill == null) ? 0 : poundBill.hashCode());
 		result = prime * result + ((ranges == null) ? 0 : ranges.hashCode());
-		result = prime * result + ((recvAddr == null) ? 0 : recvAddr.hashCode());
 		result = prime * result + ((remindAccouts == null) ? 0 : remindAccouts.hashCode());
 		result = prime * result + ((sellerId == null) ? 0 : sellerId.hashCode());
 		result = prime * result + ((sellerType == null) ? 0 : sellerType.hashCode());
@@ -444,11 +441,6 @@ public class Bill extends Object implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Bill other = (Bill) obj;
-		if (billBidRecs == null) {
-			if (other.billBidRecs != null)
-				return false;
-		} else if (!billBidRecs.equals(other.billBidRecs))
-			return false;
 		if (billNo == null) {
 			if (other.billNo != null)
 				return false;
@@ -463,6 +455,11 @@ public class Bill extends Object implements Serializable {
 			if (other.billTitle != null)
 				return false;
 		} else if (!billTitle.equals(other.billTitle))
+			return false;
+		if (billType == null) {
+			if (other.billType != null)
+				return false;
+		} else if (!billType.equals(other.billType))
 			return false;
 		if (buyerId == null) {
 			if (other.buyerId != null)
@@ -519,10 +516,10 @@ public class Bill extends Object implements Serializable {
 				return false;
 		} else if (!loginAccouts.equals(other.loginAccouts))
 			return false;
-		if (payDate == null) {
-			if (other.payDate != null)
+		if (num == null) {
+			if (other.num != null)
 				return false;
-		} else if (!payDate.equals(other.payDate))
+		} else if (!num.equals(other.num))
 			return false;
 		if (payType == null) {
 			if (other.payType != null)
@@ -534,15 +531,15 @@ public class Bill extends Object implements Serializable {
 				return false;
 		} else if (!pledgePrice.equals(other.pledgePrice))
 			return false;
+		if (poundBill == null) {
+			if (other.poundBill != null)
+				return false;
+		} else if (!poundBill.equals(other.poundBill))
+			return false;
 		if (ranges == null) {
 			if (other.ranges != null)
 				return false;
 		} else if (!ranges.equals(other.ranges))
-			return false;
-		if (recvAddr == null) {
-			if (other.recvAddr != null)
-				return false;
-		} else if (!recvAddr.equals(other.recvAddr))
 			return false;
 		if (remindAccouts == null) {
 			if (other.remindAccouts != null)
@@ -597,21 +594,12 @@ public class Bill extends Object implements Serializable {
 		return true;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL)
-	public List<BillBidRec> getBillBidRecs() {
-		return billBidRecs;
-	}
-
-	public void setBillBidRecs(List<BillBidRec> billBidRecs) {
-		this.billBidRecs = billBidRecs;
-	}
-
 	@Column(nullable = false)
-	public String getSellerType() {
+	public Integer getSellerType() {
 		return sellerType;
 	}
 
-	public void setSellerType(String sellerType) {
+	public void setSellerType(Integer sellerType) {
 		this.sellerType = sellerType;
 	}
 

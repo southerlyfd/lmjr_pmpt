@@ -1,5 +1,7 @@
 package com.pmpt.controller;
 
+import static org.mockito.Matchers.booleanThat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pmpt.common.ActionLogClass;
@@ -80,7 +84,8 @@ public class LoginAccoutController {
 				"请求登录");
 		if (phone != null && MainUtilityTools.phoneNum(phone) && pwd != null && MainUtilityTools.pwd(pwd)) {
 			Map<String, Object> maps = new HashMap<>();
-			maps = service.signIn(phone, pwd, deviceType); // loginAccoutId、phone、userId、loginSeesion
+			String pwdMD5= MD5Util.setMD5(pwd);
+			maps = service.signIn(phone, pwdMD5, deviceType); // loginAccoutId、phone、userId、loginSeesion
 			if (!maps.isEmpty()) {
 				String token = (String) maps.get("token");
 				res.setStatus(ResponseStatusCode.SUCCESS.getCode());
@@ -144,17 +149,19 @@ public class LoginAccoutController {
 	public Response registerByPhone(String phone, String pwd, String smsNum) {
 		Response res = new Response();
 		Map<String, Object> loginAcMap = null;
-		if (phone != null && pwd != null && smsNum != null) {
+		boolean pwdb = MainUtilityTools.pwd(pwd);
+		if (phone != null && pwdb && smsNum != null) {
 			boolean p = MainUtilityTools.phoneNum(phone);
 			if (p) { // 手机号格式是否正确
 				actionLogService.addLog(null, ActionLogClass.INFO.getCode(), ActionLogCode.REGIST.getCode(), "LM21001",
 						phone, "请求注册");
 				String sms = redisService.getRedis(MD5Util.setMD5(phone));
-				if (sms.equals(smsNum)) {
+				if ("123456".equals(smsNum)) { // 测试使用--( sms != null && sms.equals(smsNum) )
 					LoginAccout loginAccout = new LoginAccout();
 					loginAccout.setIsEffect(Valid.VALID.getKey());
 					loginAccout.setPhone(phone);
-					loginAccout.setPwd(BCrypt.hashpw(pwd, BCrypt.gensalt()));
+//					loginAccout.setPwd(BCrypt.hashpw(pwd, BCrypt.gensalt()));
+					loginAccout.setPwd(MD5Util.setMD5(pwd));
 
 					// 组装环信账户密码
 					RegisterUsers users = new RegisterUsers();
@@ -430,6 +437,8 @@ public class LoginAccoutController {
 	 */
 	@RequestMapping(WebURIConstant.LOGINACCOUT_GETSMS)
 	public Response getSMS(String phone) {
+	/*@RequestMapping(value = WebURIConstant.LOGINACCOUT_GETSMS, method = RequestMethod.POST)
+	public Response getSMS(@RequestParam(value = "phone", required = true) String phone) {*/
 		Response res = new Response();
 		boolean flag = false;
 		String redisValue = "";
